@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"webhook/queue"
 	redisClient "webhook/redis"
 
 	"github.com/go-redis/redis/v8" // Make sure to use the correct version
@@ -24,6 +25,8 @@ func main() {
 
 	// Create a channel to act as the queue
 	webhookQueue := make(chan redisClient.WebhookPayload, 100) // Setting buffer size as 100
+
+	go queue.ProcessWebhooks(ctx, webhookQueue)
 
 	// Subscribe to the "transactions" channel
 	err := redisClient.Subscribe(ctx, client, webhookQueue)
